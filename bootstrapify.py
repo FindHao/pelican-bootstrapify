@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from pelican import signals, contents
 
 BOOTSTRAPIFY_DEFAULT = {
-    'table': ['table', 'table-striped'],
+    'table': ["table", "table-bordered", "table-striped" ],
     'img': ['img-fluid']
 }
 BOOTSTRAPIFY_KEY = 'BOOTSTRAPIFY'
@@ -37,6 +37,12 @@ def replace_in_with(searchterm, soup, attributes):
         attribute_set = set(item.attrs.get('class', []) + attributes)
         item.attrs['class'] = list(attribute_set)
 
+def table_responsive(soup):
+    """wrap table with div"""
+    for item in soup.select('table'):
+        new_tag = soup.new_tag("div")
+        new_tag['class'] = "table-responsive"
+        item.wrap(new_tag)
 
 def bootstrapify(content):
     if isinstance(content, contents.Static):
@@ -47,7 +53,7 @@ def bootstrapify(content):
 
     for selector, classes in replacements.items():
         replace_in_with(selector, soup, classes)
-
+    table_responsive(soup)
     content._content = soup.decode()
 
 
